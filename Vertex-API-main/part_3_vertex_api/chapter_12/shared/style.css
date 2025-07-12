@@ -1,0 +1,307 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+}
+
+.controls {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 3001;
+  pointer-events: auto;
+}
+
+.controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controls button:active {
+  transform: scale(0.95);
+}
+
+.material-symbols-outlined {
+  font-size: 28px;
+}
+
+.video-container {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: rgba(128, 128, 128, 0.2);
+}
+
+video {
+  max-width: 60%;  /* 70%'den 60%'a düşürüldü - daha küçük video */
+  max-height: 60%;  /* 70%'den 60%'a düşürüldü - daha küçük video */
+  width: auto;
+  height: auto;
+  min-width: 240px;  /* 280px'den 240px'e düşürüldü */
+  min-height: 180px;  /* 200px'den 180px'e düşürüldü */
+  object-fit: contain;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+video:not(.hidden) {
+  display: block !important;
+}
+
+.hidden {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.function-info {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  margin: 10px auto;
+  max-width: 800px;
+  border-radius: 5px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+}
+
+/* Wav2Lip Styles */
+.wav2lip-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #121212;
+  color: #e0e0e0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Debug: Wav2Lip section'ını görünür yap */
+.wav2lip-section {
+  display: block !important;
+}
+
+.wav2lip-start-overlay {
+  text-align: center;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  border: 2px solid #007bff;
+}
+
+.wav2lip-start-overlay h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.wav2lip-start-overlay p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+.wav2lip-start-overlay button {
+  font-size: 1.5em;
+  padding: 15px 30px;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  background: transparent;
+  color: #007bff;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.wav2lip-start-overlay button:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+.wav2lip-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.wav2lip-content h2 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.wav2lip-back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wav2lip-back-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+/* ================================================================= */
+/* ===  WAV2LIP VİDEO KONTEYNERİ İÇİN NİHAİ VE TEMİZ STİLLER  === */
+/* ================================================================= */
+
+/* 1. ADIM: Video kabının boyutunu ve konumunu buradan ayarlayın */
+.wav2lip-wrapper {
+  /* Konumlandırma (Ortalamak için gerekli) - DEĞİŞTİRMEYİN */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Boyutlandırma (İstediğiniz gibi değiştirin) */
+  width: 75vw;            /* Genişlik: Ekran genişliğinin %75'i */
+  aspect-ratio: 16 / 9;   /* En-boy oranı: 16:9 (Yükseklik otomatik ayarlanır) */
+                          /* Örn: 1 / 1 (kare), 4 / 3 vb. deneyebilirsiniz */
+
+  /* Görsel İyileştirmeler (İsteğe bağlı) */
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden; /* Köşeleri yuvarlatınca taşmaları gizler */
+}
+
+/* 2. ADIM: Videoların kabı doldurmasını sağlayan kural - DEĞİŞTİRMEYİN */
+#wav2lip-idle,
+#wav2lipPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Videonun kabı doldurmasını sağlar, orantıyı korur */
+                     /* Alternatif: 'contain' videonun tamamını gösterir ama boşluk bırakabilir */
+}
+
+/* Not: Diğer tüm kurallarınız (.controls, .hidden vb.) olduğu gibi kalabilir. */
+
+#wav2lipStatus {
+  font-size: 1.1em;
+  font-style: italic;
+  color: #999;
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .wav2lip-wrapper {
+    width: 85vw;  /* Mobilde daha geniş kullanım */
+    aspect-ratio: 16 / 9;  /* 16:9 oranını koru */
+  }
+  
+  .wav2lip-start-overlay h1 {
+    font-size: 2em;
+  }
+  
+  .wav2lip-content h2 {
+    font-size: 1.5em;
+  }
+}
+
+.hidden { 
+  display: none !important; 
+}
+
+/* Ses kontrol butonu */
+.wav2lip-mute-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.wav2lip-mute-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.wav2lip-mute-button .material-symbols-outlined {
+  font-size: 24px;
+}
+
+/* Gemini ses kontrol butonu için özel stil */
+#geminiMuteButton {
+  background: rgba(0, 123, 255, 0.8) !important;
+}
+
+#geminiMuteButton:hover {
+  background: rgba(0, 123, 255, 1) !important;
+  transform: scale(1.05);
+}
+
+#geminiMuteButton .material-symbols-outlined {
+  font-size: 28px;
+}

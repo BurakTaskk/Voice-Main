@@ -1,0 +1,249 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+}
+
+.controls {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 3001; /* Diğer her şeyin üstünde olması için */
+  pointer-events: auto;
+}
+
+.controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controls button:active {
+  transform: scale(0.95);
+}
+
+.material-symbols-outlined {
+  font-size: 28px;
+}
+
+.video-container {
+  /* Bu, Gemini'nin kamera önizlemesi içindir, olduğu gibi kalabilir. */
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: rgba(128, 128, 128, 0.2);
+}
+
+/* Genel video kuralını daha az spesifik yapalım, ID ile ezebilelim */
+video {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.hidden {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.function-info {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  margin: 10px auto;
+  max-width: 800px;
+  border-radius: 5px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+}
+
+/* ================================================================= */
+/* ===         WAV2LIP BÖLÜMÜ İÇİN TÜM STİLLER BURADA         === */
+/* ================================================================= */
+
+/* Genel Wav2Lip Alanı */
+.wav2lip-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #121212;
+  z-index: 2000;
+  display: flex; /* İçeriği ortalamak için flex kullan */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Başlangıç Ekranı */
+.wav2lip-start-overlay {
+  text-align: center;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+}
+
+.wav2lip-start-overlay h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.wav2lip-start-overlay button {
+  font-size: 1.5em;
+  padding: 15px 30px;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  background: transparent;
+  color: #007bff;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.wav2lip-start-overlay button:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+
+/* Canlı İçerik Alanı */
+.wav2lip-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Geri Butonu */
+.wav2lip-back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+.wav2lip-back-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+/* --- VİDEO KONTEYNERİ İÇİN DÜZELTİLMİŞ VE KÜÇÜLTÜLMÜŞ KISIM --- */
+
+/* 1. Video kabının boyutunu ve konumunu buradan ayarlayın */
+.wav2lip-wrapper {
+  position: relative; /* Bu, içindeki videoların konumlanması için referans noktasıdır */
+  
+  /* Boyutlandırma (İstediğiniz gibi değiştirin) */
+  width: 60vw;            /* <<< VİDEOYU KÜÇÜLTMEK İÇİN DEĞERİ 60 YAPTIM >>> */
+  aspect-ratio: 16 / 9;   /* En-boy oranı: 16:9 (Yükseklik otomatik ayarlanır) */
+
+  /* Görsel İyileştirmeler */
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px; /* Alttaki yazı ile arasında boşluk bırakır */
+}
+
+/* 2. Videoların (hem bekleme hem de canlı) kabı doldurmasını sağlayan kural. */
+#wav2lip-idle,
+#wav2lipPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Videonun kabı doldurmasını sağlar, orantıyı korur */
+}
+
+/* --- DÜZELTME SONU --- */
+
+/* Durum Yazısı */
+#wav2lipStatus {
+  font-size: 1.1em;
+  font-style: italic;
+  color: #999;
+  text-align: center;
+}
+
+/* Ses kontrol butonu */
+.wav2lip-mute-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+.wav2lip-mute-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+.wav2lip-mute-button .material-symbols-outlined {
+  font-size: 24px;
+}
+
+
+/* Responsive design (Mobil cihazlar için) */
+@media (max-width: 768px) {
+  .wav2lip-wrapper {
+    width: 90vw;  /* Mobilde ekranı daha çok kaplasın, 95vw'den küçülttüm */
+  }
+}
